@@ -1,27 +1,24 @@
 <template>
   <section class="profile">
     <HeaderTop title="我的"/>
-
     <section class="profile-number">
-<!--      //路由跳转-->
-      <router-link to="/login" class="profile-link">
+      <router-link :to="userInfo.id ? '/userinfo': '/login'" class="profile-link">
         <div class="profile_image">
           <i class="iconfont icon-person"></i>
         </div>
         <div class="user-info">
-          <p class="user-info-top">登录/注册</p>
+          <p class="user-info-top" v-if="!userInfo.phone">{{userInfo.name || '登录/注册'}}</p>
           <p>
                 <span class="user-icon">
                   <i class="iconfont icon-shouji icon-mobile"></i>
                 </span>
-            <span class="icon-mobile-number">暂无绑定手机号</span>
+            <span class="icon-mobile-number">{{userInfo.phone || '暂无绑定手机号'}}</span>
           </p>
         </div>
         <span class="arrow">
           <i class="iconfont icon-jiantou1"></i>
         </span>
       </router-link>
-<!--      将a标签进行删除，里面的内容进行转移至路由-->
     </section>
     <section class="profile_info_data border-1px">
       <ul class="info_data_list">
@@ -70,7 +67,7 @@
               <i class="iconfont icon-vip"></i>
             </span>
         <div class="my_order_div">
-          <span>硅谷外卖会员卡</span>
+          <span>外卖会员卡</span>
           <span class="my_order_icon">
                 <i class="iconfont icon-jiantou1"></i>
               </span>
@@ -91,50 +88,89 @@
         </div>
       </a>
     </section>
+
+    <section class="profile_my_order border-1px">
+      <mt-button type="danger" style="width: 100%" v-if="userInfo.name" @click="logout">退出登陆</mt-button>
+    </section>
   </section>
 </template>
 
 <script>
-    import HeaderTop from "../../components/HeaderTop/HeaderTop";
+    import {mapState} from 'vuex'
+    import { MessageBox, Toast } from 'mint-ui'
+    import HeaderTop from '../../components/HeaderTop/HeaderTop.vue'
+
+
     export default {
-        components:{
+
+        computed: {
+            ...mapState(['userInfo'])
+        },
+        methods: {
+            logout () {
+                MessageBox.confirm('确认退出吗?').then(
+                    action => {
+                        // 请求退出
+                        this.$store.dispatch('logout')
+                        Toast('退出完成')
+                    },
+                    action => {
+                        console.log('点击了取消')
+                    }
+                );
+            }
+        },
+
+        components: {
             HeaderTop
         }
     }
 </script>
 
-<style lang="stylus" rel="stylesheet"scoped>
+<style lang="stylus" rel="stylesheet/stylus">
   @import "../../common/stylus/minxins.styl"
-  .header //头部公共css
-    background-color #02a774
-    position fixed
-    z-index 100
-    left 0
-    top 0
-    width 100%
-    height 45px
-    .header_search
-      position absolute
-      left 15px
-      top 50%
-      transform translateY(-50%)
-      width 10%
-      height 50%
-      .iconfont
-        font-size 22px
-        color #fff
-    .header_title
-      position absolute
-      top 50%
-      left 50%
-      transform translate(-50%, -50%)
-      width 30%
-      color #fff
-      font-size 22px
-      text-align center
   .profile //我的
     width 100%
     overflow hidden
+    .header
+      background-color #02a774
+      position fixed
+      z-index 100
+      left 0
+      top 0
+      width 100%
+      height 45px
+      .header_search
+        position absolute
+        left 15px
+        top 50%
+        transform translateY(-50%)
+        width 10%
+        height 50%
+        .icon-sousuo
+          font-size 25px
+          color #fff
+      .header_title
+        position absolute
+        top 50%
+        left 50%
+        transform translate(-50%, -50%)
+        width 50%
+        color #fff
+        text-align center
+        .header_title_text
+          font-size 20px
+          color #fff
+          display block
+      .header_login
+        font-size 14px
+        color #fff
+        position absolute
+        right 15px
+        top 50%
+        transform translateY(-50%)
+        .header_login_text
+          color #fff
     .profile-number
       margin-top 45.5px
       .profile-link
